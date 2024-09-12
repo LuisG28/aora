@@ -5,12 +5,13 @@ import { images } from '../../constants'
 import SearchInput from '../../components/SearchInput'
 import Tendring from '../../components/Tendring'
 import EmptyState from '../../components/EmptyState'
-import { getAllPost } from '../../lib/appwrite'
+import { getAllPost, getLastestPost } from '../../lib/appwrite'
 import useAppWrite from '../../lib/useAppWrite'
 import VideoCard from '../../components/VideoCard'
 
 const Home = () => {
   const { data : posts, refetch } = useAppWrite(getAllPost);
+  const { data : lastestPost } = useAppWrite(getLastestPost);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -49,13 +50,7 @@ const Home = () => {
                 Lastes vidios
               </Text>
               <Tendring 
-                posts={[
-                  { id : 1 },
-                  { id : 2 },
-                  { id : 3 },
-                  { id : 4 },
-
-                ] ?? []}
+                posts={lastestPost ?? []}
               />
             </View>
           </View>
