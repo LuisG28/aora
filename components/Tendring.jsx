@@ -1,50 +1,62 @@
 import React, { useState } from 'react'
 import * as Animatable from 'react-native-animatable'
-import { View, Text, FlatList, TouchableOpacity, ImageBackground, Image } from 'react-native'
+import { FlatList, TouchableOpacity, ImageBackground, Image } from 'react-native'
 import { icons } from '../constants'
+import { Video, ResizeMode } from 'expo-av'
 
 const zoomIn = {
-  0 : {
-    scale : 0.9
-  }, 
-  1 : {
-    scale : 1.1
+  0: {
+    scale: 0.9
+  },
+  1: {
+    scale: 1.1
   }
 }
 
 const zoomOut = {
-  0 : {
-    scale : 1
-  }, 
-  1 : {
-    scale : 0.9
+  0: {
+    scale: 1
+  },
+  1: {
+    scale: 0.9
   }
 }
 
 const TrendingItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false)
-  
+
   return (
-    <Animatable.View 
+    <Animatable.View
       className="mr-5"
       animation={activeItem === item.$id ? zoomIn : zoomOut}
       duration={500}
     >
       {
         play ? (
-          <Text className="text-white">Playing</Text>
+          <Video
+            source={{ uri : item.video}}
+            className="h-52 w-72 rounded-[35px] mt-16 bg-white/10"
+            resizeMode={ResizeMode.CONTAIN}
+            useNativeControls
+            shouldPlay
+            onPlaybackStatusUpdate={(status)=>{
+              if (status.didJustFinish) {
+                setPlay(false)
+              }
+            }}
+          />
         ) : (
-          <TouchableOpacity 
+          <TouchableOpacity
             className="relative justify-center items-center"
             activeOpacity={0.7}
-            onPress={()=>setPlay(true)}
+            onPress={() => setPlay(true)}
           >
-            <ImageBackground 
-              source={{ uri : item.thumbnail}}
+            <ImageBackground
+              source={{ uri: item.thumbnail }}
               className="w-52 h-72 rounded-[35px] my-5 overflow-hidden shadow-lg shadow-black/40"
               resizeMode='cover'
             />
-            <Image 
+            <Image
               source={icons.play}
               className="h-12 w-12 absolute"
               resizeMode='contain'
@@ -60,10 +72,10 @@ const Tendring = ({ posts }) => {
   const [activeItem, setActiveItem] = useState(posts[0])
 
   const viewableItemsChanged = ({ viewableItems }) => {
-    if(viewableItems.length > 0) {
+    if (viewableItems.length > 0) {
       setActiveItem(viewableItems[0].key)
     }
-  }   
+  }
 
   return (
     <FlatList
@@ -78,9 +90,9 @@ const Tendring = ({ posts }) => {
       )}
       onViewableItemsChanged={viewableItemsChanged}
       viewabilityConfig={{
-        itemVisiblePercentThreshold : 70
+        itemVisiblePercentThreshold: 70
       }}
-      contentOffset={{ x : 170 }}
+      contentOffset={{ x: 170 }}
       horizontal
     />
   )
