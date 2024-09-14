@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native'
+import { View, FlatList, TouchableOpacity, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import EmptyState from '../../components/EmptyState'
 import { getUserPost, signOut } from '../../lib/appwrite'
