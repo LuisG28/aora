@@ -2,19 +2,23 @@ import React from 'react'
 import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import EmptyState from '../../components/EmptyState'
-import { getUserPost } from '../../lib/appwrite'
+import { getUserPost, signOut } from '../../lib/appwrite'
 import useAppWrite from '../../lib/useAppWrite'
 import VideoCard from '../../components/VideoCard'
 import { useGlobalContext } from '../../context/GlobalProvider'
 import { icons } from '../../constants'
 import InfoBox from '../../components/InfoBox'
+import { router } from 'expo-router'
 
 const Profile = () => {
-  const { user } = useGlobalContext(); 
+  const { user, setUser, setIsLogged } = useGlobalContext(); 
   const { data: posts } = useAppWrite(()=>getUserPost(user.$id));
  
-  const logout = () => {
-
+  const logout = async() => {
+    await signOut();
+    setUser(null);
+    setIsLogged(false);
+    router.replace('/sign-in')
   }
 
   return (
