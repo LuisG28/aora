@@ -1,10 +1,11 @@
-import { Text, ScrollView, View, TouchableOpacity, Image } from 'react-native'
+import { Text, ScrollView, View, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '../../components/FormFiel'
 import { Video, ResizeMode } from 'expo-av'
 import { icons } from '../../constants'
 import CustomButton from '../../components/CustomButton'
+import * as DocumentPicker from 'expo-document-picker'
 
 const Create = () => {
   const [uploading, setUploading] = useState(false)
@@ -14,6 +15,31 @@ const Create = () => {
     thumbnail: null,
     prompt: null, 
   });
+
+  const openPicker = async(selectType) => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type : selectType === 'image' ? ['image/png', 'image/jpg'] : ['video/mp4', 'video/gif']
+    });
+
+    if(!result.canceled) {
+      if (selectType === 'image') {
+        setForm({
+          ...form,
+          thumbnail : result.assets[0]
+        })
+      }
+      if (selectType === 'video') {
+        setForm({
+          ...form,
+          video : result.assets[0]
+        })
+      }
+    } else {
+      setTimeout(() => {
+        Alert.alert('Document picked', JSON.stringify(result, null, 2));
+      }, 100);
+    }
+  }
 
   const submit = () => {
 
@@ -36,7 +62,7 @@ const Create = () => {
           <Text className="text-base text-gray-100 font-pmedium">
             Upload Video
           </Text>
-          <TouchableOpacity >
+          <TouchableOpacity onPress={()=> openPicker('video')}>
             {
               form.video ? (
                 <Video 
@@ -60,7 +86,7 @@ const Create = () => {
           <Text className="text-base text-gray-100 font-pmedium">
             Thumbnail Image
           </Text>
-          <TouchableOpacity >
+          <TouchableOpacity onPress={()=> openPicker('image')}>
             {
               form.thumbnail ? (
                 <Image
