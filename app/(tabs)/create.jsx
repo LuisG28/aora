@@ -56,12 +56,12 @@ const Create = () => {
     } catch (error) {
       Alert.alert('Error', error.message)
     } finally {
-      // setForm({
-      //   title: '',
-      //   video: null,
-      //   thumbnail: null,
-      //   prompt: null, 
-      // })
+      setForm({
+        title: '',
+        video: null,
+        thumbnail: null,
+        prompt: null, 
+      })
       setUploading(false)
     }
   }
