@@ -6,8 +6,13 @@ import { Video, ResizeMode } from 'expo-av'
 import { icons } from '../../constants'
 import CustomButton from '../../components/CustomButton'
 import * as DocumentPicker from 'expo-document-picker'
+import { router } from 'expo-router'
+import { useGlobalContext } from '../../context/GlobalProvider'
+import { createVideo } from '../../lib/appwrite'
+import * as ImagePicker from 'expo-image-picker';
 
 const Create = () => {
+  const { user } = useGlobalContext();
   const [uploading, setUploading] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -17,8 +22,11 @@ const Create = () => {
   });
 
   const openPicker = async(selectType) => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type : selectType === 'image' ? ['image/png', 'image/jpg'] : ['video/mp4', 'video/gif']
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      aspect: [4,3],
+      mediaTypes: selectType === 'image' ? ImagePicker.MediaTypeOptions.Images : ImagePicker.MediaTypeOptions.Videos,
     });
 
     if(!result.canceled) {
@@ -34,15 +42,28 @@ const Create = () => {
           video : result.assets[0]
         })
       }
-    } else {
-      setTimeout(() => {
-        Alert.alert('Document picked', JSON.stringify(result, null, 2));
-      }, 100);
     }
   }
 
-  const submit = () => {
-
+  const submit = async() => {
+    if(!form.prompt || !form.title || !form.thumbnail || !form.video) return Alert.alert('Please fill in all the fields')
+    setUploading(true);
+    
+    try {
+      await createVideo({ ...form, userId : user.$id });
+      Alert.alert('Success', 'Post uploaded successfully');
+      router.push('/home')
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    } finally {
+      setForm({
+        title: '',
+        video: null,
+        thumbnail: null,
+        prompt: null, 
+      })
+      setUploading(false)
+    }
   }
 
   return (
@@ -68,9 +89,7 @@ const Create = () => {
                 <Video 
                   source={{ uri: form.video.uri }}
                   className="w-full h-64 rounded-xl"
-                  useNativeControls
                   resizeMode={ResizeMode.COVER}
-                  isLooping
                 />
               ) : (
                 <View className="w-full h-40 px-4 bg-black-100 rounded-2xl justify-center items-center">
